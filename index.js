@@ -18,6 +18,8 @@ async function run() {
         const servicesCollection = client.db('leather').collection('services')
         const orderCollection = client.db('leather').collection('order')
       const userCollection = client.db('leather').collection('user')
+      const productCollection = client.db('leather').collection('product')
+      const reviewCollection = client.db('leather').collection('review')
 
   const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
@@ -48,10 +50,16 @@ async function run() {
 
         app.get('/service', async (req, res) => {
             const query = {}
-            const cursor = servicesCollection.find(query)
+            const cursor = servicesCollection.find(query).project({name:1,image:1,description:1,price:1})
             const services = await cursor.toArray()
             res.send(services)
         })
+        // app.get('/service', async (req, res) => {
+        //     const query = {}
+        //     const cursor = servicesCollection.find(query)
+        //     const services = await cursor.toArray()
+        //     res.send(services)
+        // })
       
       app.get('/service/:id', async (req, res) => {
          const id = req.params.id
@@ -122,7 +130,31 @@ async function run() {
             const query = {_id: ObjectId(id)}
             const result = await orderCollection.deleteOne(query)
             res.send(result)
-        })
+      })
+      
+      app.get('/product', async (req, res) => {
+      const product = await productCollection.find().toArray();
+      res.send(product);
+      })
+
+      app.post('/product',verifyJWT,verifyAdmin, async (req, res) => {
+      const product = req.body;
+      const result = await productCollection.insertOne(product);
+      res.send(result);
+      });
+      
+      app.delete('/product/:email', verifyJWT, verifyAdmin, async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const result = await productCollection.deleteOne(filter);
+      res.send(result);
+      })
+      
+      app.post('/review', async (res, req) => {
+        const newReview = req.body
+        const result = await reviewCollection.insertOne(newReview)
+        res.send(result)
+      })
 
     }
     finally {
