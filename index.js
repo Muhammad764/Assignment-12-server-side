@@ -164,7 +164,7 @@ async function run() {
         res.send(result)
       })
 
-      app.get('/profile', async (req, res) => {
+      app.get('/profile', verifyJWT, async (req, res) => {
         const query = {}
         const cursor = profileCollection.find(query)
         const profile = await cursor.toArray()
