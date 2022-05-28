@@ -149,8 +149,15 @@ async function run() {
       const result = await productCollection.deleteOne(filter);
       res.send(result);
       })
+
+      app.get('/review', async (req,res) => {
+        const query = {}
+        const cursor = reviewCollection.find(query)
+        const review = await cursor.toArray()
+        res.send(review)
+      })
       
-      app.post('/review', async (res, req) => {
+      app.post('/review', async (req,res) => {
         const newReview = req.body
         const result = await reviewCollection.insertOne(newReview)
         res.send(result)
