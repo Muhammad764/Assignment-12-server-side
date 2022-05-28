@@ -14,12 +14,13 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 async function run() {
     try {
-        await client.connect()
-        const servicesCollection = client.db('leather').collection('services')
-        const orderCollection = client.db('leather').collection('order')
+      await client.connect()
+     const servicesCollection = client.db('leather').collection('services')
+      const orderCollection = client.db('leather').collection('order')
       const userCollection = client.db('leather').collection('user')
       const productCollection = client.db('leather').collection('product')
       const reviewCollection = client.db('leather').collection('review')
+      const profileCollection = client.db('leather').collection('profile')
 
   const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
@@ -161,6 +162,13 @@ async function run() {
         const newReview = req.body
         const result = await reviewCollection.insertOne(newReview)
         res.send(result)
+      })
+
+      app.get('/profile', async (req, res) => {
+        const query = {}
+        const cursor = profileCollection.find(query)
+        const profile = await cursor.toArray()
+        res.send(profile)
       })
 
     }
